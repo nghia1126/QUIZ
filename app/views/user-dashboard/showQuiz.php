@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -41,7 +40,9 @@
                             <td><?php echo $quiz->duration_minutes ?> minutes</td>
                             <td><?php echo $quiz->start_time ?></td>
                             <td><?php echo $quiz->end_time ?></td>
-                            <td><button class="btn btn-success"><a class="nav-link link-light" href="<?= BASE_URL . 'quiz/start?id='.$quiz->id ?>">Start</a></button></td>
+                            <td><button class="btn btn-success"><a class="nav-link link-light" href="<?= BASE_URL . 'quiz/start?id=' . $quiz->id ?>">Start</a></button></td>
+                            <td><button class="btn btn-info"><a class="nav-link link-light" href="<?= BASE_URL . 'quiz/info?id=' . $quiz->id .'&subject_id=' . $quiz->subject_id ?>">Info</a></button></td>
+
                         </tr>
                     <?php } ?>
                 </tbody>

@@ -2,10 +2,13 @@
 
 namespace App\Controllers;
 
+session_start();
+
 use App\Models\Answer;
 use App\Models\Question;
 use App\Models\quiz;
 use App\Models\Subject;
+use App\Models\StudentQuiz;
 
 class QuizController
 {
@@ -13,33 +16,32 @@ class QuizController
     {
         $quizs = Quiz::all();
         $subjects = Subject::all();
-        include_once "./app/views/quiz/index.php";
+        return view('quiz.index', ['quizs' => $quizs, 'subjects' => $subjects]);
     }
 
     public function addForm()
     {
         $subjects = Subject::all();
-        include_once "./app/views/quiz/add-form.php";
+        return view('quiz.add-Form', ['subjects' => $subjects]);
     }
 
     public function saveAdd()
     {
-        $data = [
-            'name' => $_POST['name'],
-            'start_time' => $_POST['start_time'],
-            'end_time' => $_POST['end_time'],
-            'duration_minutes' => $_POST['duration_minutes'],
-            'status' => isset($_POST['status']) ? 1 : 0,
-            'is_shuffle' => isset($_POST['is_shuffle']) ? 1 : 0,
-            'subject_id' => $_POST['id_subject'],
-        ];
         $model = new Quiz();
-        $quiz = $model->insert($data);
+        $model->name = $_POST['name'];
+        $model->start_time = $_POST['start_time'];
+        $model->end_time = $_POST['end_time'];
+        $model->duration_minutes =  $_POST['duration_minutes'];
+        $model->status = isset($_POST['status']) ? 1 : 0;
+        $model->is_shuffle = isset($_POST['is_shuffle']) ? 1 : 0;
+        $model->subject_id = $_POST['id_subject'];
+
+        $model->save();
         header('location: ' . BASE_URL . 'quiz');
         die;
     }
 
-    public function remove()
+    public function remove($id = null)
     {
         $id = $_GET['id'];
         Quiz::destroy($id);
@@ -51,34 +53,32 @@ class QuizController
         $id = $_GET['id'];
         $model = Quiz::where('id', $id)->first();
         $subjects = Subject::all();
-        $questions = Question::where('quiz_id', $model->id)->get();
-
+        // $questions = Question::where('quiz_id', $id)->get();
+        // var_dump($questions);die;
         if (!$model) {
             header('Location: ' . BASE_URL . 'quiz');
             die;
         }
-        include_once './app/views/quiz/edit-form.php';
+        return view('quiz.edit-Form', ['model' => $model, 'subjects' => $subjects]);
     }
 
     public function saveEdit($id = null)
     {
         $id = $_GET['id'];
         $model = Quiz::where('id', $id)->first();
+
         if (!$model) {
             header('Location: ' . BASE_URL . 'quiz');
             die;
-            // var_dump($id);
         }
-        $data = [
-            'name' => $_POST['name'],
-            'subject_id' => $_POST['subject_id'],
-            'duration_minutes' => $_POST['duration_minutes'],
-            'start_time' => $_POST['start_time'],
-            'end_time' => $_POST['end_time'],
-            'status' => $_POST['status'],
-        ];
-        $model->update($data);
-        // var_dump($id);
+        $model->name = $_POST['name'];
+        // var_dump($_POST['subject_id']);die;
+        $model->subject_id = $_POST['subject_id'];
+        $model->duration_minutes = $_POST['duration_minutes'];
+        $model->start_time = $_POST['start_time'];
+        $model->end_time = $_POST['end_time'];
+        $model->status = $_POST['status'];
+        $model->save();
         header('Location: ' . BASE_URL . 'quiz');
         die;
     }
@@ -95,8 +95,8 @@ class QuizController
         $quiz_id = $_GET['id'];
         $questions = Question::where('quiz_id', $quiz_id)->get();
 
-        foreach ($questions as $question){
-            $answers[$question->id] = Answer::where('question_id' , $question->id)->get();
+        foreach ($questions as $question) {
+            $answers[$question->id] = Answer::where('question_id', $question->id)->get();
             // echo "<pre>";
             // var_dump($answers);die;
         }
@@ -105,7 +105,40 @@ class QuizController
         include_once "./app/views/user-dashboard/start.php";
     }
 
-    public function submitQuiz(){
-        
+    public function submitQuiz($quiz_id = null)
+    {
+        $quiz_id = $_GET['quiz_id'];
+        // var_dump($quiz_id);die;
+        $questions = Question::where('quiz_id', $quiz_id)->get();
+        $count_ques = Question::where('quiz_id', $quiz_id)->count();
+        // var_dump($count_ques);die;
+        $arrAnswer = array();
+        foreach ($questions as $question) {
+            $arrAnswer[] = $_POST['question-' . $question->id];
+        }
+        $temp = array_count_values($arrAnswer);
+        if (isset($temp['1'])) {
+            $result = 10 / $count_ques * $temp['1'];
+        } else {
+            $result = 0;
+        }
+
+        // var_dump($result);die;
+        $student_quizs = new StudentQuiz();
+
+        $student_quizs->student_id = $_SESSION['auth']['id'];
+        $student_quizs->quiz_id = $quiz_id;
+        $student_quizs->start_time = $_SESSION['start_time'];
+        $student_quizs->end_time = date('Y-m-d H:i:s');
+        $student_quizs->score = $result;
+        $student_quizs->save();
+        include_once "./app/views/user-dashboard/result.php";
+    }
+
+    public function info($id = null)
+    {
+        $quiz_id = $_GET['id'];
+        $student_quizs_show = StudentQuiz::where('student_id', $_SESSION['auth']['id'])->where('quiz_id', $quiz_id)->get();
+        include_once "./app/views/user-dashboard/score.php";
     }
 }

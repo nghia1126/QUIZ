@@ -19,29 +19,41 @@ function applyRoute($url)
         }
     });
 
+    $router->get('test-layout', function () {
+        return view('layout.main');
+    });
 
     // định nghĩa ra url mới
     $router->group(['prefix' => 'mon-hoc'], function ($router) {
         $router->get('/', [SubjectController::class, 'index']);
         $router->get('/tao-moi', [SubjectController::class, 'addForm']);
-        $router->post('/luu-tao-moi', [SubjectController::class, 'saveAdd']);
+        $router->post('/tao-moi', [SubjectController::class, 'saveAdd']);
         $router->get('/cap-nhat{id}?', [SubjectController::class, 'editForm']);
-        $router->post('/luu-cap-nhat{id}?', [SubjectController::class, 'saveEdit']);
+        $router->post('/cap-nhat{id}?', [SubjectController::class, 'saveEdit']);
         $router->get('/xoa{id}?', [SubjectController::class, 'remove']);
 
         $router->get(['/{id}?', 'subject.index'], [SubjectController::class, 'index']);
     });
 
-    $router->get('login', [LoginController::class, 'loginForm']);
-    $router->post('login/check', [LoginController::class, 'checkLogin']);
+    $router->group(['prefix' => 'login'], function ($router) {
+        $router->get('/', [LoginController::class, 'loginForm']);
+        $router->post('/', [LoginController::class, 'checkLogin']);
+        $router->get('/signup', [LoginController::class, 'signUpForm']);
+        $router->post('/signup', [LoginController::class, 'addUser']);
+    });
     $router->get('admin-dashboard', [DashboardController::class, 'adminIndex']);
     $router->get('user-dashboard', [DashboardController::class, 'userIndex']);
-    $router->get('logout', function () {
+    $router->get('sign-out', function () {
         unset($_SESSION['auth']);
-        return "done";
+        // var_dump($_SESSION['auth']); die();
+        // return "done";
+        header("Location: ". BASE_URL . 'user-dashboard');
+        // var_dump(isset($_SESSION['auth']));
+        die;
     });
     $router->get('subject/quiz{id}?', [QuizController::class, 'showQuiz']);
     $router->get('quiz/start{id}?', [QuizController::class, 'start']);
+    $router->post('subject/quiz/start{id}?', [QuizController::class, 'submitQuiz']);
     // định nghĩa ra url mới
     $router->group(['prefix' => 'quiz'], function ($router) {
         $router->get('/', [QuizController::class, 'index']);
@@ -50,7 +62,7 @@ function applyRoute($url)
         $router->get('/cap-nhat{id}?', [QuizController::class, 'editForm']);
         $router->post('/luu-cap-nhat{id}?', [QuizController::class, 'saveEdit']);
         $router->get('/xoa{id}?', [QuizController::class, 'remove']);
-
+        $router->get('/info{id}?', [QuizController::class, 'info']);
         // $router->get(['/{id}?', 'subject.index'], [SubjectController::class, 'index']);
     });
 

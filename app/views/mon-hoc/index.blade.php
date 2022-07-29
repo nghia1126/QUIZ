@@ -1,0 +1,77 @@
+
+    @extends('layout.main')
+    @section('content')
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
+    <div class="content-header">
+        <div class="container-fluid">
+          <div class="row mb-2">
+            <div class="col-sm-6">
+              <h1 class="m-0">Subject Manager</h1>
+            </div><!-- /.col -->
+            <div class="col-sm-6">
+              <ol class="breadcrumb float-sm-right">
+                <li class="breadcrumb-item"><a href="<?= BASE_URL . 'admin-dashboard'?>">Home</a></li>
+                <li class="breadcrumb-item active">Subject Manager</li>
+              </ol>
+            </div><!-- /.col -->
+          </div><!-- /.row -->
+        </div><!-- /.container-fluid -->
+    </div>
+    
+<header class="header" id="header">
+    <div class="header_toggle"> <i class='bx bx-menu' id="header-toggle"></i> </div>
+    <div class="header_img"> <img src="" alt=""> </div>
+</header>
+
+<!--Container Main start-->
+<div class=" bg-light">
+    
+    <div class="container mt-2 px-0">
+        <div class="mb-2 d-flex justify-content-between align-items-center">
+            <div class="px-0"><button class="btn btn-warning"><a class="nav-link link-light" href="<?= BASE_URL . 'mon-hoc/tao-moi' ?>">Add Subject</a></button></div>
+        </div>
+
+        <div class="form-inline">
+            <form action="<?= BASE_URL . 'mon-hoc/'?>">
+                <div class="input-group">
+                    <input name="keyword" type="search" class="form-control rounded" placeholder="Search" aria-label="Search" aria-describedby="search-addon" />
+                    <input type="submit"  class="btn btn-outline-primary" value="Search"/>
+                  </div>
+            </form>
+        </div>
+        <div class="table-responsive">
+            <table class="table table-responsive ">
+                <thead>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Author</th>
+                    <th>Image</th>
+                    <th colspan="2"></th>
+                </thead>
+                <tbody>
+                    <?php foreach ($subjects as $sub) : ?>
+                        <tr>
+                            <td><?php echo $sub->id ?></td>
+                            <td><?php echo $sub->name ?></td>
+                            <?php foreach ($author as $aut) {
+                                if ($sub->author_id == $aut->id) { ?>
+                                    <td><?php echo $aut->name ?></td>
+                            <?php }
+                            } ?>
+                            <td><img src="<?= BASE_URL.$sub->img ?>" width="100px" height="auto"></td>
+                            <td><button class="btn btn-success"><a class="nav-link link-light" href="<?= BASE_URL . 'mon-hoc/cap-nhat?id=' . $sub->id ?>">Update</a></button></td>
+                            <td><button class="btn btn-danger"><a class="nav-link link-light" href="<?= BASE_URL . 'mon-hoc/xoa?id=' . $sub->id ?>">Delete</a></button></td>
+                        </tr>
+                    <?php endforeach ?>
+                </tbody>
+            </table>
+            </table>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.9.2/dist/umd/popper.min.js" integrity="sha384-IQsoLXl5PILFhosVNubq5LC7Qb9DXgDA9i+tQ8Zj3iwWAwPtgFTxbJ8NT4GN1R8p" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/js/bootstrap.min.js" integrity="sha384-cVKIPhGWiC2Al4u+LWgxfKTRIcfu0JTxR+EQDz/bgldoEyl4H0zUF0QKbrJ0EcQF" crossorigin="anonymous"></script>
+@endsection
+
+<!-- </html> -->

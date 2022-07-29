@@ -7,27 +7,40 @@ use App\Models\User;
 session_start();
 class LoginController
 {
-    public function index()
-    {
-        $Users = User::all();
+    // public function index()
+    // {
+    //     $Users = User::all();
 
-        include_once "./app/views/login/index.php";
+    //     include_once "./app/views/login/index.php";
+    // }
+
+    public function signUpForm()
+    {
+        include_once "./app/views/account/signUpForm.php";
     }
 
-    public function addForm()
+    public function addUser()
     {
-        include_once "./app/views/login/add-form.php";
-    }
-
-    public function saveAdd()
-    {
-        $model = new User();
-        $data = [
-            'name' => $_POST['name']
-        ];
-        $model->insert($data);
-        header('location: ' . BASE_URL . 'login');
-        die;
+        $user = User::where('email', $_POST['email'])->first();
+        if (!isset($user)) {
+            $target_file = 'public/dist/img/';
+            move_uploaded_file($_FILES['avatar']['tmp_name'], $target_file . $_FILES['avatar']['name']);
+    
+            $model = new User();
+            $model->name = $_POST['name'];
+            $model->email = $_POST['email'];
+            $model->password = password_hash($_POST['password'], PASSWORD_DEFAULT);
+            $model->avatar = $target_file.$_FILES['avatar']['name'];
+            $model->role_id = 2;
+    
+            $model->save();
+            header('location: ' . BASE_URL . 'login');
+            die;
+        } else {
+            $_SESSION['error'] = "Email đã được đăng ký !!!";
+            header('location: ' . BASE_URL . 'login/signup');
+        }
+        
     }
 
     public function remove()
@@ -69,6 +82,7 @@ class LoginController
     public function checkLogin()
     {
         // var_dump("a");die;
+        
         $email = $_POST['email'];
         $password = $_POST['password'];
 
@@ -80,8 +94,8 @@ class LoginController
                 "name" => $model->name,
                 "email" => $model->email,
                 "role_id" => $model->role_id
-
             ];
+            // var_dump($_SESSION['auth']['id']);die;
             if ($model->role_id == 1) {
                 header('Location: ' . BASE_URL . 'admin-dashboard');
                 die;
@@ -94,12 +108,5 @@ class LoginController
             header('Location: ' . BASE_URL . 'login');
             die;
         }
-    }
-
-    public function logout()
-    {
-        unset($_SESSION['account']);
-        header('Location: ' . BASE_URL . 'login');
-        die();
     }
 }

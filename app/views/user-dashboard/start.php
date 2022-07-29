@@ -1,7 +1,8 @@
+<?php
 
-<?php 
-// echo "<pre>";
-// var_dump($answers[21]); die();
+use Illuminate\Support\Facades\Date;
+$start_time = date('Y-m-d H:i:s');
+$_SESSION['start_time'] = $start_time;
 ?>
 <!DOCTYPE html>
 <html>
@@ -54,48 +55,26 @@
 
                 <div id="time" style="float:right">timeout</div>
             </h2>
-            <?php
-            $i = 1;
-            foreach ($questions as $question) { ?>
-                <form method="post" id="form1" action="<?=BASE_URL .'subject/quiz/start?quiz_id='.$question->quiz_id; ?>">
-                    <table class="table table-bordered">
-                        <thead>
-                            <tr class="danger">
-                                <th><?php echo $i; ?> <?php echo $question->name; ?> </th>
+            <form method="post" id="form1" action="<?= BASE_URL . 'subject/quiz/start?quiz_id=' . $question->quiz_id; ?>">
+                <table class="table table-bordered">
+                    <tbody>
+                        <?php foreach ($questions as $question) { ?>
+                            <tr>
+                                <a href=""><?= $question->name ?></a> <br>
+                                <?php foreach ($answers[$question->id] as $answer) : ?>
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="radio" name="question-<?= $question->id?>" id="flexRadioDefault1" value="<?= $answer->is_correct ?>">
+                                        <label class="form-check-label" for="flexRadioDefault1">
+                                            <?= $answer->content ?>
+                                        </label>
+                                    </div>
+                                <?php endforeach ?>
                             </tr>
-                        </thead>
-
-                        <tbody>
-                            <?php if (isset($answers[$question->id][0])) { ?>
-                                <tr class="info">
-                                    <td>&nbsp;1&emsp;<input type="radio" value="0" name="<?php echo $question->id; ?>">&nbsp;<?php echo $answers[$question->id][0]->content; ?> </td>
-                                </tr>
-                            <?php } ?>
-                            <?php if (isset($answers[$question->id][1])) { ?>
-                                <tr class="info">
-                                    <td>&nbsp;2&emsp;<input type="radio" value="1" name="<?php echo $question->id; ?>" />&nbsp;<?php  echo $answers[$question->id][1]->content; ?></td>
-                                </tr>
-                            <?php } ?>
-                            <?php if (isset($answers[$question->id][2])) { ?>
-                                <tr class="info">
-                                    <td>&nbsp;3&emsp;<input type="radio" value="2" name="<?php echo $question->id; ?>" />&nbsp;<?php  echo $answers[$question->id][2]->content; ?></td>
-                                </tr>
-                            <?php } ?>
-                            <?php if (isset($answers[$question->id][3])) { ?>
-                                <tr class="info">
-                                    <td>&nbsp;4&emsp;<input type="radio" value="3" name="<?php $question->id; ?>" />&nbsp;<?php  echo $answers[$question->id][3]->content; ?></td>
-                                </tr>
-                            <?php } ?>
-                            <tr class="info">
-                                <td><input type="radio" checked="checked" style="display:none" value="no_attempt" name="<?php echo $question->id; ?>"></td>
-                            </tr>
-                        </tbody>
-
-                    </table>
-                <?php $i++;
-            } ?>
-                <center><input type="submit" value="submit Quiz" class="btn btn-success" /></center>
-                </form>
+                        <?php } ?>
+                    </tbody>
+                </table>
+                <input type="submit" name="submit" value="Kết thúc">
+            </form>
         </div>
         <div class="col-sm-2"></div>
     </div>

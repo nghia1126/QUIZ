@@ -2,15 +2,17 @@
 namespace App\Controllers;
 
 use App\Models\Subject;
+use App\Models\Quiz;
 
 session_start();
 class DashboardController {
     public function adminIndex(){
-        include_once "./app/views/admin-dashboard/index.php";
+        return view('layout.main');
     }
     public function userIndex(){
         $subjects = Subject::all();
-        include_once "./app/views/user-dashboard/index.php";
+        $count_quiz = new Quiz();
+        return view('user-dashboard.index', ['subjects' => $subjects, 'count_quiz' => $count_quiz]);
     }
 }
 ?>
